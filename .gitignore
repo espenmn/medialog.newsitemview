@@ -1,0 +1,7 @@
+
+*.pyc
+
+medialog.newsitemview.egg-info/
+*.gz
+
+PKG-INFO
