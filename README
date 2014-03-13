@@ -15,6 +15,11 @@ See http://products.medialog.no/newsitem-view/
 Changelog
 =========
 
+0.9
+---------------------
+- Added default settings in control panel (medialog.controlpanel is installed)
+  [espenmn]
+
 
 0.8.3
 ---------------------
@@ -109,10 +114,6 @@ Changelog
 0.1 (11 11 2011)
 ---------------------      
 - First version [espenmn]
-
-
-**TODO:**
-Need help with the vocabulary, so it takes images sizes from portal properties
 
 
 Keywords: plone zope newsitem view

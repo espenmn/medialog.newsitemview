@@ -9,7 +9,10 @@ from Products.ATContentTypes.interface import IATFolder, IATTopic
 from Products.Archetypes.atapi import SelectionWidget, BooleanWidget
 from archetypes.schemaextender.interfaces import ISchemaExtender, IBrowserLayerAwareExtender 
 from archetypes.schemaextender.field import ExtensionField
-from medialog.newsitemview.interfaces import INewsitemObject, IFolderObject
+from medialog.newsitemview.interfaces import INewsitemObject, IFolderObject, INewsitemviewSettings
+
+from zope.component import getUtility
+from plone.registry.interfaces import IRegistry
 
 
 _ = MessageFactory('medialog.newsitemview')
@@ -21,8 +24,18 @@ class _StringExtensionField (ExtensionField, StringField):
 class _BooleanExtensionField(ExtensionField, BooleanField):
 	pass    
 
- 
- 
+def default_folder_settings():
+	settings = getUtility(IRegistry).forInterface(INewsitemviewSettings)
+	return settings.default_folderimagesize
+
+def default_newsitem_settings():
+	settings = getUtility(IRegistry).forInterface(INewsitemviewSettings)
+	return settings.default_newsitemsize
+
+def default_hideimages_settings():
+	settings = getUtility(IRegistry).forInterface(INewsitemviewSettings)
+	return settings.default_hideimages
+	
 
 class ContentTypeExtender(object):
     """Adapter that adds custom data used for news item image size."""
@@ -33,7 +46,7 @@ class ContentTypeExtender(object):
         _StringExtensionField("newsitemsize",
             schemata = "settings",
             vocabulary_factory='medialog.newsitemview.ImageSizeVocabulary',
-            default="preview",
+            default_method=default_newsitem_settings,
             interfaces = (INewsitemObject,),
             widget = SelectionWidget(
                 label = _(u"label_newsitemsize",
@@ -49,16 +62,19 @@ class ContentTypeExtender(object):
 
     def getFields(self):
         return self._fields
+        
 
+	
 class FolderTypeExtender(object):
     """Adapter that adds custom data used for image size."""
     adapts(IATFolder)
     implements(ISchemaExtender, IBrowserLayerAwareExtender)
     layer = IFolderObject
+    	
     _fields = [
         _StringExtensionField("folderimagesize",
             schemata = "settings",
-            default="mini",
+            default_method=default_folder_settings,
             vocabulary_factory='medialog.newsitemview.ImageSizeVocabulary',
             interfaces = (INewsitemObject,),
             widget = SelectionWidget(
@@ -71,7 +87,7 @@ class FolderTypeExtender(object):
         _BooleanExtensionField("hide_images",
             schemata = "settings",
             interfaces = (INewsitemObject,),
-            default = False,
+            default_method=default_hideimages_settings,
             widget = BooleanWidget(
                 label = _(u"label_hide_images",
                     default=u"Hide Images in the summary view"),
@@ -87,6 +103,7 @@ class FolderTypeExtender(object):
 
     def getFields(self):
         return self._fields
+        
 
 
 class TopicTypeExtender(object):
